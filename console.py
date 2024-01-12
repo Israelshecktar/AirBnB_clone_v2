@@ -73,7 +73,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
+                    if pline[0] is '{' and pline[-1] is '}'\
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -111,20 +111,52 @@ class HBNBCommand(cmd.Cmd):
 
     def emptyline(self):
         """ Overrides the emptyline method of CMD """
+
         pass
 
     def do_create(self, args):
-        """ Create an object of any class"""
-        if not args:
-            print("** class name missing **")
-            return
-        elif args not in HBNBCommand.classes:
-            print("** class doesn't exist **")
-            return
-        new_instance = HBNBCommand.classes[args]()
-        storage.save()
+        """Create an object of any class with given parameters."""
+
+    arguments = args.split(" ")
+    if len(arguments) == 0:
+        print("** class name missing **")
+        return
+    if arguments[0] not in self.classes:
+        print("** class doesn't exist **")
+        return
+
+    class_name = arguments[0]
+    kwargs = {}
+    for param in arguments[1:]:
+        key_value = param.split("=", 1)
+        if len(key_value) == 2:
+            key, value = key_value
+            value = self.process_value(value)
+            if value is not None:
+                kwargs[key] = value
+
+    try:
+        new_instance = self.classes[class_name](**kwargs)
+        new_instance.save()  # Save the new instance to storage
         print(new_instance.id)
-        storage.save()
+    except Exception as e:
+        print("** Error creating instance: {}".format(e))
+
+def process_value(self, value):
+    """Process the string value from the command line."""
+    if value[0] == '"' and value[-1] == '"':
+        value = value.strip('"').replace('_', ' ').replace('\\"', '"')
+    elif '.' in value:
+        try:
+            return float(value)
+        except ValueError:
+            pass
+    else:
+        try:
+            return int(value)
+        except ValueError:
+            pass
+    return value
 
     def help_create(self):
         """ Help information for the create method """
