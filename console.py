@@ -142,8 +142,8 @@ class HBNBCommand(cmd.Cmd):
     except Exception as e:
         print("** Error creating instance: {}".format(e))
 
-def process_value(self, value):
-    """Process the string value from the command line."""
+    def process_value(self, value):
+        """Process the string value from the command line."""
     if value[0] == '"' and value[-1] == '"':
         value = value.strip('"').replace('_', ' ').replace('\\"', '"')
     elif '.' in value:
@@ -351,6 +351,7 @@ def process_value(self, value):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
