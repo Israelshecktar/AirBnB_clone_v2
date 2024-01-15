@@ -117,46 +117,35 @@ class HBNBCommand(cmd.Cmd):
     def do_create(self, args):
         """Create an object of any class with given parameters."""
 
-        arguments = args.split(" ")
-        if len(arguments) == 0:
+        arg_list = args.split()
+        if not arg_list:
             print("** class name missing **")
             return
-        if arguments[0] not in self.classes:
+        class_name = arg_list[0]
+        if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
+        parameters = arg_list[1:]
+        new_instance = HBNBCommand.classes[class_name]()
 
-        class_name = arguments[0]
-        kwargs = {}
-        for param in arguments[1:]:
-            key_value = param.split("=", 1)
-            if len(key_value) == 2:
-                key, value = key_value
-                value = self.process_value(value)
-                if value is not None:
-                    kwargs[key] = value
-
-        try:
-            new_instance = self.classes[class_name](**kwargs)
-            new_instance.save()  # Save the new instance to storage
-            print(new_instance.id)
-        except Exception as e:
-            print("** Error creating instance: {}".format(e))
-
-    def process_value(self, value):
-        """Process the string value from the command line."""
-        if value[0] == '"' and value[-1] == '"':
-            value = value.strip('"').replace('_', ' ').replace('\\"', '"')
-        elif '.' in value:
+        for param in parameters:
+            key, _, value = param.partition("=")
+            if not key or not value:
+                continue
+            # Replace underscores with spaces for string values
+            if value[0] == '"' and value[-1] == '"':
+                value = value.strip('"').replace('_', ' ').replace('\\', '')
+                value = value.replace('\"', '"')  # Handle escaped double quo
+            # Cast numeric values to their appropriate types
             try:
-                return float(value)
-            except ValueError:
-                pass
-        else:
-            try:
-                return int(value)
-            except ValueError:
-                pass
-        return value
+                value = eval(value)
+                if isinstance(value, (int, float)) or isinstance(value, str):
+                    setattr(new_instance, key, value)
+            except (SyntaxError, NameError):
+                continue  # Skip values that can't be evaluated or cast
+
+        new_instance.save()
+        print(new_instance.id)
 
     def help_create(self):
         """ Help information for the create method """
