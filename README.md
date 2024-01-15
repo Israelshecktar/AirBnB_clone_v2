@@ -1,6 +1,6 @@
 # 0x00. AirBnB clone - The console
 
-**Welcome to the AirBnB Clone project!** 🏡🌍 This repository entails a direct clone version of the world's famous and dynamic platform for property rentals, designed to offer seamless accommodation experiences. Whether you're looking for a cozy cabin or a luxurious villa, our user-friendly interface ensures an unforgettable stay.
+**Welcome to the AirBnB Clone project!** 🏡🌍 This repository entails a direct clone version of the world's famous and dynamic platform for property rentals, designed to offer seamless accommodation experiences. Whether you're looking for a cozy cabin or a luxurious villa, our user-friendly interface ensures an unforgettable .
 
 <center><h3>Repository Contents by Project Task</h3> </center>
 
