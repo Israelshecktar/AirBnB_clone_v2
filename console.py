@@ -134,15 +134,16 @@ class HBNBCommand(cmd.Cmd):
                 continue
             # Replace underscores with spaces for string values
             if value[0] == '"' and value[-1] == '"':
-                value = value.strip('"').replace('_', ' ').replace('\\', '')
-                value = value.replace('\"', '"')  # Handle escaped double quo
-            # Cast numeric values to their appropriate types
-            try:
-                value = eval(value)
-                if isinstance(value, (int, float)) or isinstance(value, str):
-                    setattr(new_instance, key, value)
-            except (SyntaxError, NameError):
-                continue  # Skip values that can't be evaluated or cast
+                value = value[1:-1].replace('_', ' ').replace('\\"', '"')
+            else:
+                try:
+                    if '.' in value:
+                        value = float(value)
+                    else:
+                        value = int(value)
+                except ValueError:
+                    continue
+            setattr(new_instance, key, value)
 
         new_instance.save()
         print(new_instance.id)
