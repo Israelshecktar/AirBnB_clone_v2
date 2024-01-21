@@ -13,8 +13,8 @@ class FileStorage:
         """Returns a dictionary of models currently in storage"""
         if cls:
             cls_name = cls.__name__ if type(cls) == type else cls
-            return {k: v for k,
-                    v in FileStorage.__objects.items() if cls_name in k}
+            return {k: v for k, v in
+                    FileStorage.__objects.items() if str(cls_name) in k}
         return FileStorage.__objects
 
     def new(self, obj):
