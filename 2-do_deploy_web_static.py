@@ -9,6 +9,7 @@ from os.path import exists
 env.hosts = ['35.174.204.152', '100.26.133.61']
 env.user = 'ubuntu'
 
+
 def do_deploy(archive_path):
     """Distributes an archive to your web servers."""
     # Check if the archive path exists
@@ -34,4 +35,3 @@ def do_deploy(archive_path):
         .format(archive_name))
     # Return True if all operations have been done correctly, otherwise False
     return True
-
