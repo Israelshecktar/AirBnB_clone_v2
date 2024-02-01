@@ -1,37 +1,52 @@
 #!/usr/bin/python3
-# Fabric script that distributes an archive to your web servers,
-# using the function do_deploy
+"""
+A fabric script that pack and distributes an archive on server
+"""
 
-from fabric.api import env, put, run
-from os.path import exists
 
-# Define the hosts and the user
+from fabric.api import *
+import os
+from datetime import datetime
+
 env.hosts = ['35.174.204.152', '100.26.133.61']
-env.user = 'ubuntu'
+
+
+def do_pack():
+    """
+    return the archive path if archive has generated correctly.
+    """
+
+    local("mkdir -p versions")
+    date = datetime.now().strftime("%Y%m%d%H%M%S")
+    archived_f_path = "versions/web_static_{}.tgz".format(date)
+    t_gzip_archive = local("tar -cvzf {} web_static".format(archived_f_path))
+
+    if t_gzip_archive.succeeded:
+        return archived_f_path
+    else:
+        return None
 
 
 def do_deploy(archive_path):
-    """Distributes an archive to your web servers."""
-    # Check if the archive path exists
-    if not exists(archive_path):
-        return False
-    # Get the archive filename without the extension
-    archive_file = archive_path.split('/')[-1]
-    archive_name = archive_file.split('.')[0]
-    # Upload the archive to the /tmp/ directory of the web server
-    put(archive_path, '/tmp/{}'.format(archive_file))
-    # Uncompress the archive to the folder /data/web_static/releases/
-    # <archive filename without extension> on the web server
-    run('mkdir -p /data/web_static/releases/{}'.format(archive_name))
-    run('tar -xzf /tmp/{} -C /data/web_static/releases/{}'
-        .format(archive_file, archive_name))
-    # Delete the archive from the web server
-    run('rm /tmp/{}'.format(archive_file))
-    # Delete the symbolic link /data/web_static/current from the web server
-    run('rm -rf /data/web_static/current')
-    # Create a new the symbolic link /data/web_static/current on the web server
-    # linked to the new version of your code
-    run('ln -s /data/web_static/releases/{} /data/web_static/current'
-        .format(archive_name))
-    # Return True if all operations have been done correctly, otherwise False
-    return True
+    """
+    Distribute archive.
+    """
+    if os.path.exists(archive_path):
+        archived_file = archive_path[9:]
+        newest_version = "/data/web_static/releases/" + archived_file[:-4]
+        archived_file = "/tmp/" + archived_file
+        put(archive_path, "/tmp/")
+        run("sudo mkdir -p {}".format(newest_version))
+        run("sudo tar -xzf {} -C {}/".format(archived_file,
+                                             newest_version))
+        run("sudo rm {}".format(archived_file))
+        run("sudo mv {}/web_static/* {}".format(newest_version,
+                                                newest_version))
+        run("sudo rm -rf {}/web_static".format(newest_version))
+        run("sudo rm -rf /data/web_static/current")
+        run("sudo ln -s {} /data/web_static/current".format(newest_version))
+
+        print("New version deployed!")
+        return True
+
+    return False
