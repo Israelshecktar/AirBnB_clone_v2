@@ -47,3 +47,8 @@ class FileStorage:
             obj_key = "{}.{}".format(type(obj).__name__, obj.id)
             if obj_key in FileStorage.__objects:
                 del FileStorage.__objects[obj_key]
+
+    def close(self):
+        """Close the file storage by reloading the JSON file"""
+
+        self.reload()
