@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 """This module starts a Flask web application that displays 'Hello HBNB!',
-'HBNB', 'C <text>', 'Python <text>', and 'n is a number'"""
+'HBNB', 'C <text>', 'Python <text>', and a HTML page with 'Number: n'"""
 
-from flask import Flask
+from flask import Flask, render_template
 app = Flask(__name__)
 
 
@@ -36,6 +36,12 @@ def python(text):
 def number(n):
     """This function returns 'n is a number' only if n is an integer"""
     return '{} is a number'.format(n)
+
+
+@app.route('/number_template/<int:n>', strict_slashes=False)
+def number_template(n):
+    """This function returns a HTML page with 'Number: n' only if n is an integer"""
+    return render_template('5-number.html', n=n)
 
 
 if __name__ == '__main__':
